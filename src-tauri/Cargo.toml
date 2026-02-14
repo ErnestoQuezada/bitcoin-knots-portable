@@ -1,0 +1,29 @@
+[package]
+name = "bitcoin_portable"
+version = "0.1.0"
+description = "Portable Bitcoin Knots Node Wrapper"
+authors = ["Acreonte"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "1", features = [] }
+
+[dependencies]
+tauri = { version = "1", features = [ "window-start-dragging", "shell-open", "fs-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bitcoincore-rpc = "0.19.0" # Standard Rust Bitcoin RPC library
+reqwest = "0.11"
+tokio = { version = "1", features = ["full"] }
+chrono = "0.4"
+base64 = "0.13" # Or use rpc creds directly
+anyhow = "1.0"
+home = "0.5"
+log = "0.4"
+env_logger = "0.10"
+uuid = { version = "1.4", features = ["v4"] }
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

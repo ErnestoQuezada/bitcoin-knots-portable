@@ -1,0 +1,88 @@
+{
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "beforeBuildCommand": "npm run build",
+        "devPath": "http://localhost:1420",
+        "distDir": "../dist"
+    },
+    "package": {
+        "productName": "bitcoin-portable",
+        "version": "0.2.1"
+    },
+    "tauri": {
+        "allowlist": {
+            "all": false,
+            "shell": {
+                "all": false,
+                "open": true,
+                "scope": [
+                    {
+                        "name": "bin/bitcoind.exe",
+                        "cmd": "program",
+                        "args": true
+                    }
+                ]
+            },
+            "fs": {
+                "all": true,
+                "scope": [
+                    "$APP/*",
+                    "$App/*",
+                    "$RESOURCE/*"
+                ]
+            },
+            "window": {
+                "all": false,
+                "startDragging": true
+            }
+        },
+        "bundle": {
+            "active": true,
+            "category": "DeveloperTool",
+            "copyright": "",
+            "deb": {
+                "depends": []
+            },
+            "externalBin": [],
+            "icon": [
+                "icons/32x32.png",
+                "icons/64x64.png",
+                "icons/icon.ico"
+            ],
+            "identifier": "com.bitcoin-portable.app",
+            "longDescription": "",
+            "macOS": {
+                "entitlements": null,
+                "exceptionDomain": "",
+                "frameworks": [],
+                "providerShortName": null,
+                "signingIdentity": null
+            },
+            "resources": [],
+            "shortDescription": "",
+            "windows": {
+                "certificateThumbprint": null,
+                "digestAlgorithm": "sha256",
+                "timestampUrl": ""
+            }
+        },
+        "security": {
+            "csp": null
+        },
+        "updater": {
+            "active": false
+        },
+        "windows": [
+            {
+                "fullscreen": false,
+                "height": 640,
+                "resizable": true,
+                "title": "Bitcoin Node",
+                "width": 800,
+                "center": true,
+                "transparent": true,
+                "decorations": false
+            }
+        ]
+    }
+}
