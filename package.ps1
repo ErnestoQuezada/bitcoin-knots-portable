@@ -29,7 +29,7 @@ if ($build.ExitCode -ne 0) {
 
 # 3. Copy Binary
 write-host "Copying Executable..." -ForegroundColor Green
-Copy-Item "src-tauri/target/release/bitcoin-portable.exe" "release/"
+Copy-Item "src-tauri/target/release/bitcoin_portable.exe" "release/bitcoin-portable.exe"
 
 # 4. Copy Bitcoind (if exits)
 if (Test-Path "bin/bitcoind.exe") {

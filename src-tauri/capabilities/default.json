@@ -1,0 +1,16 @@
+{
+    "$schema": "../gen/schemas/capability.json",
+    "identifier": "default",
+    "description": "Default capabilities for the application",
+    "windows": [
+        "main"
+    ],
+    "permissions": [
+        "core:default",
+        "core:window:allow-start-dragging",
+        "core:window:allow-close",
+        "core:window:allow-minimize",
+        "core:window:allow-maximize",
+        "core:window:allow-set-focus"
+    ]
+}

@@ -1,0 +1,363 @@
+/* Retro-Modern Bitcoin Knots Styling - Minimalist Edition */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg-deep: #0D0D0D;
+  --bg-panel: #161616;
+  --bg-card: #1E1E1E;
+  --bg-hover: #252525;
+  --accent: #F7931A;
+  --accent-soft: rgba(247, 147, 26, 0.1);
+  --text-main: #FFFFFF;
+  --text-dim: #94A3B8;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --success: #22C55E;
+  --danger: #EF4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-main);
+  font-family: 'Outfit', -apple-system, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  user-select: none;
+  background: radial-gradient(circle at top right, rgba(247, 147, 26, 0.03), transparent 40%);
+}
+
+/* Header & Glassmorphism */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background: rgba(22, 22, 22, 0.8);
+  backdrop-filter: blur(10px);
+  /* border-bottom: 1px solid var(--border-subtle); */
+  z-index: 50;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-box {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(247, 147, 26, 0.3);
+}
+
+.status-badge {
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-active {
+  background: var(--success);
+  box-shadow: 0 0 10px var(--success);
+  animation: pulse 2s infinite;
+}
+
+.status-inactive {
+  background: var(--danger);
+}
+
+/* Main Layout */
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.grid-system {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .grid-system {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cards & Panels */
+.premium-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-card:hover {
+  border-color: rgba(247, 147, 26, 0.2);
+}
+
+.card-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+/* Typography Enhancements */
+.big-stat {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.sub-stat {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Buttons */
+.btn-action {
+  cursor: pointer;
+  border: none;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: all 0.2s;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-start {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 15px rgba(247, 147, 26, 0.2);
+}
+
+.btn-start:hover {
+  transform: translateY(-1px);
+  background: #ffad42;
+}
+
+.btn-stop {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-stop:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Forms */
+.search-wrapper {
+  position: relative;
+}
+
+.minimal-input {
+  background: #090909;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.minimal-input:focus {
+  border-color: var(--accent);
+}
+
+/* Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Draggable Header & Controls */
+.top-bar {
+  height: 36px;
+  background: #1A1A1A;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 1000;
+  -webkit-app-region: drag;
+}
+
+.window-controls {
+  display: flex;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+}
+
+.control-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: var(--text-dim);
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+}
+
+.btn-close:hover {
+  background: #EF4444 !important;
+  color: white !important;
+}
+
+/* Desktop Master Grid */
+.desktop-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  /* Reduced from 1.5rem */
+  /* Reduced from 1.5rem */
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.layout-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  /* Reduced from 1.5rem */
+  /* Reduced from 1.5rem */
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trinity-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  /* Reduced from 1.5rem */
+  /* Reduced from 1.5rem */
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trinity-stack>* {
+  flex: 1;
+  min-height: 0;
+}
+
+.horizontal-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  /* Reduced from 1.5rem */
+}
+
+/* Footer */
+.footer {
+  height: 28px;
+  background: #0D0D0D;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  z-index: 1000;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-version-label {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.footer-right {
+  opacity: 0.6;
+}
