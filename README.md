@@ -33,6 +33,8 @@ No hidden services.
 
 Plug in. Boot up. Verify.
 
+[Build instructions](BUILD.md)
+
 
 QUICK START
 ------------------------------------------------------------
