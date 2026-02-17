@@ -161,18 +161,18 @@ function App() {
             <header className="header" style={{ padding: isDesktop ? '1rem 1.5rem' : '1.25rem 1.5rem' }}>
                 <div className="header-logo">
                     <div className="logo-box">
-                        <img src="/knots-logo.svg" className="object-contain" style={{ height: '32px', width: '32px' }} alt="Bitcoin Knots" />
+                        <img src="/knots-logo.svg" className="object-contain" style={{ height: '32px', width: '32px' }} alt="Bitcoin Knots Portable" />
                     </div>
                     <div>
-                        <h1 style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>Bitcoin Knots</h1>
-                        <p style={{ fontSize: '10px', color: 'var(--text-dim)', fontFamily: 'monospace' }}>BIP110 • PORTABLE</p>
+                        <h1 style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>Bitcoin Knots Portable</h1>
+                        <p style={{ fontSize: '10px', color: 'var(--text-dim)', fontFamily: 'monospace' }}>BIP110 ENABLED • MAINNET</p>
                     </div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div className="status-badge">
                         <span className={`status-dot ${running ? 'status-active' : 'status-inactive'}`}></span>
-                        {running ? "NODE ONLINE" : "NODE OFFLINE"}
+                        {loading ? (running ? "STOPPING..." : "STARTING...") : (running ? "NODE ONLINE" : "NODE OFFLINE")}
                     </div>
                     <button
                         onClick={running ? handleStop : handleStart}
@@ -223,7 +223,7 @@ function App() {
 
             <footer className="footer">
                 <div className="footer-left">
-                    <span className="footer-version-label">v0.2.4</span>
+                    <span className="footer-version-label">v0.2.5</span>
                 </div>
                 <div className="footer-right">
                     Bitcoin Knots Portable (BIP110)

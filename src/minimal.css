@@ -244,6 +244,28 @@ body {
   }
 }
 
+@keyframes highlight-pulse-anim {
+  0% {
+    transform: scale(1);
+    color: var(--accent);
+  }
+
+  50% {
+    transform: scale(1.05);
+    color: #FFAD42;
+  }
+
+  100% {
+    transform: scale(1);
+    color: var(--accent);
+  }
+}
+
+.highlight-pulse {
+  animation: highlight-pulse-anim 2s ease-out;
+  display: inline-block;
+}
+
 /* Draggable Header & Controls */
 .top-bar {
   height: 36px;

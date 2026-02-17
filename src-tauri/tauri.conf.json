@@ -1,6 +1,6 @@
 {
     "productName": "bitcoin-portable",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "identifier": "com.bitcoin-portable.app",
     "build": {
         "beforeDevCommand": "npm run dev",

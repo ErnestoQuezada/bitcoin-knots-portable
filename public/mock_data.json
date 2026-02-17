@@ -1,0 +1,46 @@
+{
+    "getblockchaininfo": {
+        "chain": "main",
+        "blocks": 830123,
+        "headers": 830123,
+        "bestblockhash": "00000000000000000000...hash...",
+        "difficulty": 72000000000000,
+        "mediantime": 1700000000,
+        "verificationprogress": 0.99999,
+        "initialblockdownload": false,
+        "chainwork": "00000000000000000000...",
+        "size_on_disk": 15000000000,
+        "pruned": true,
+        "pruneheight": 820000,
+        "automatic_pruning": true,
+        "prune_target_size": 20000000000,
+        "warnings": ""
+    },
+    "getnetworkinfo": {
+        "version": 260000,
+        "subversion": "/Satoshi:26.0.0/",
+        "protocolversion": 70016,
+        "localservices": "0000000000000408",
+        "localrelay": true,
+        "timeoffset": 0,
+        "networkactive": true,
+        "connections": 12,
+        "connections_in": 4,
+        "connections_out": 8,
+        "networks": [
+            { "name": "ipv4", "limited": false, "reachable": true, "proxy": "", "proxy_randomize_credentials": false },
+            { "name": "ipv6", "limited": false, "reachable": true, "proxy": "", "proxy_randomize_credentials": false },
+            { "name": "onion", "limited": true, "reachable": false, "proxy": "", "proxy_randomize_credentials": false }
+        ],
+        "relayfee": 0.00001000,
+        "incrementalfee": 0.00001000,
+        "localaddresses": [],
+        "warnings": ""
+    },
+    "fee_estimates": {
+        "2": 45,
+        "6": 38,
+        "144": 12
+    },
+    "check_mempool_result": "MEMPOOL\nFees: 0.00012000 sats"
+}

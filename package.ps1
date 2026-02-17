@@ -12,16 +12,18 @@ if (!(Get-Command cargo -ErrorAction SilentlyContinue)) {
 }
 write-host "Building Bitcoin Portable Release..." -ForegroundColor Cyan
 
-# 1. Clean previous build
-if (Test-Path "release") {
-    Remove-Item "release" -Recurse -Force
+# 1. Prepare Release Folder (Non-destructive)
+if (!(Test-Path "release")) {
+    New-Item -ItemType Directory -Force -Path "release" | Out-Null
 }
-New-Item -ItemType Directory -Force -Path "release" | Out-Null
-New-Item -ItemType Directory -Force -Path "release/bin" | Out-Null
+if (!(Test-Path "release/bin")) {
+    New-Item -ItemType Directory -Force -Path "release/bin" | Out-Null
+}
 
 # 2. Build Tauri App
 write-host "Compiling Rust & React..." -ForegroundColor Green
-$build = Start-Process -FilePath "npm.cmd" -ArgumentList "run tauri build" -Wait -PassThru -NoNewWindow
+# Use --no-bundle to skip installer creation (NSIS/WiX)
+$build = Start-Process -FilePath "npm.cmd" -ArgumentList "run tauri build -- --no-bundle" -Wait -PassThru -NoNewWindow
 if ($build.ExitCode -ne 0) {
     write-error "Build failed."
     exit 1
@@ -31,18 +33,14 @@ if ($build.ExitCode -ne 0) {
 write-host "Copying Executable..." -ForegroundColor Green
 Copy-Item "src-tauri/target/release/bitcoin_portable.exe" "release/bitcoin-portable.exe"
 
-# 4. Copy Bitcoind (if exits)
-if (Test-Path "bin/bitcoind.exe") {
-    write-host "Bundling bitcoind.exe..." -ForegroundColor Green
-    Copy-Item "bin/bitcoind.exe" "release/bin/"
-}
-else {
-    write-warning "bitcoind.exe NOT FOUND in local bin/ folder."
-    write-warning "You must place bitcoind.exe in release/bin/ manually."
-}
+# 4. Copy Bitcoind (Skipped as per user request: 'only bitcoin-portable.exe')
+# if (Test-Path "bin/bitcoind.exe") {
+#     write-host "Bundling bitcoind.exe..." -ForegroundColor Green
+#     Copy-Item "bin/bitcoind.exe" "release/bin/"
+# }
 
-# 5. Copy Readme
-Copy-Item "README_DIST.txt" "release/README.txt"
+# 5. Copy Readme (Skipped)
+# Copy-Item "README_DIST.txt" "release/README.txt"
 
 write-host "Build Complete!" -ForegroundColor Cyan
 write-host "Output location: ./release"

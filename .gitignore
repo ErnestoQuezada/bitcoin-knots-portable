@@ -23,3 +23,11 @@ logs/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Temporary & Test Files
+*.zip
+manual_testing/
+test_extract/
+.env.*
+run-test.bat
+src-tauri/gen/

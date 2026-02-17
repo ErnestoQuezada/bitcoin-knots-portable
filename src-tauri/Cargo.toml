@@ -1,6 +1,6 @@
 [package]
 name = "bitcoin_portable"
-version = "0.2.4"
+version = "0.2.5"
 description = "Minimalist Bitcoin Knots Node Wrapper"
 authors = ["Acreonte"]
 edition = "2021"

@@ -48,6 +48,8 @@ export const fetchNetworkInfo = async (): Promise<any> => {
     return invoke('get_network_info');
 };
 
+
+
 export const checkMempool = async (query: string): Promise<string> => {
     if (MOCK_MODE) {
         const data = await loadMockData();

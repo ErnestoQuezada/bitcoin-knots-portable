@@ -1,4 +1,5 @@
 import React from 'react';
+import '../minimal.css';
 
 interface PeersDisplayProps {
     peers: number;

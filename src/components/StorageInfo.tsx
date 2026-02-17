@@ -11,7 +11,7 @@ const StorageInfo: React.FC<StorageInfoProps> = React.memo(({ diskSize, pruned }
             <span className="card-label">Storage Info</span>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <span className="sub-stat" style={{ color: 'var(--text-dim)' }}>PRUNED MODE</span>
-                <span style={{ color: pruned ? '#22C55E' : '#999', fontWeight: 600, fontSize: '0.75rem' }}>{pruned ? "ENABLED" : "DISABLED"}</span>
+                <span style={{ color: pruned ? '#22C55E' : '#999', fontWeight: 600, fontSize: '0.75rem' }}>{pruned ? "YES" : "NO"}</span>
             </div>
             <div style={{ padding: '0.75rem', background: '#090909', borderRadius: '12px', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.6rem', color: 'var(--text-dim)', marginBottom: '0.25rem', letterSpacing: '0.1em' }}>DISK USAGE</div>

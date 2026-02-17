@@ -11,6 +11,8 @@ use std::path::{PathBuf};
 use bitcoincore_rpc::{Auth, Client, RpcApi, json};
 use std::str::FromStr;
 use serde::{Serialize};
+use std::io::{BufReader, BufRead, Write, Read}; // Added Reader/Writer traits
+use std::fs::OpenOptions; // For append mode
 
 // --- State Management ---
 
@@ -70,7 +72,53 @@ fn initialize_rpc_client(state: &NodeState, app: &AppHandle) -> Result<Arc<Clien
     Ok(arc_client)
 }
 
-// --- Commands ---
+// --- Log Buffering ---
+
+fn spawn_buffered_logger<R: Read + Send + 'static>(input: R, path: PathBuf) {
+    std::thread::spawn(move || {
+        let mut reader = BufReader::new(input);
+        let mut buffer = Vec::new();
+        let mut last_flush = std::time::Instant::now();
+        
+        // Open file in append mode.
+        let mut file = match OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&path) {
+                Ok(f) => f,
+                Err(_) => return, // Fail silently if log file can't be opened
+            };
+
+        let mut line = String::new();
+        loop {
+            line.clear();
+            match reader.read_line(&mut line) {
+                Ok(0) => break, // EOF
+                Ok(_) => {
+                    buffer.push(line.clone());
+                    
+                    // Flush condition: 50 lines or 5 seconds
+                    if buffer.len() >= 50 || last_flush.elapsed().as_secs() >= 5 {
+                        for l in &buffer {
+                            let _ = file.write_all(l.as_bytes());
+                        }
+                        let _ = file.flush();
+                        buffer.clear();
+                        last_flush = std::time::Instant::now();
+                    }
+                }
+                Err(_) => break,
+            }
+        }
+        
+        // Final flush on exit
+        for l in &buffer {
+            let _ = file.write_all(l.as_bytes());
+        }
+        let _ = file.flush();
+    });
+}
+
 
 #[tauri::command]
 fn start_node(app: AppHandle, state: State<NodeState>) -> Result<StatusResponse, String> {
@@ -108,27 +156,40 @@ fn start_node(app: AppHandle, state: State<NodeState>) -> Result<StatusResponse,
     }
 
     let log_path = data_dir.join("node.log");
-    let log_file = File::create(&log_path).map_err(|e| format!("Log create failed: {}", e))?;
-    let log_err = log_file.try_clone().map_err(|e| format!("Log clone failed: {}", e))?;
+    // Create/Truncate log file
+    let _ = File::create(&log_path).map_err(|e| format!("Log create failed: {}", e))?;
 
     let mut cmd = Command::new(bin_path);
     cmd.arg(format!("-datadir={}", data_dir.to_string_lossy()))
        .arg(format!("-conf={}", conf_path.to_string_lossy()))
        // Optimization to reduce resource usage & Antimalware triggers
-       .arg("-dbcache=300")      // Increase memory cache to reduce disk I/O
+       .arg("-dbcache=450")      // Increase memory cache to reduce disk I/O (flush less often)
        .arg("-maxconnections=40") // Reduce network noise
        .arg("-par=2")            // Limit verification threads
-       .stdout(Stdio::from(log_file))
-       .stderr(Stdio::from(log_err));
+       .arg("-printtoconsole")   // Output to stdout for buffering
+       .stdout(Stdio::piped())   // Capture stdout
+       .stderr(Stdio::piped());  // Capture stderr
 
     #[cfg(target_os = "windows")] 
     {
         use std::os::windows::process::CommandExt;
         const CREATE_NO_WINDOW: u32 = 0x08000000;
         cmd.creation_flags(CREATE_NO_WINDOW);
+        
+        // On Windows, redirect internal debug.log to NUL to prevent double-writing
+        cmd.arg("-debuglogfile=NUL");
     }
 
-    let child = cmd.spawn().map_err(|e| format!("Spawn failed: {}", e))?;
+    let mut child = cmd.spawn().map_err(|e| format!("Spawn failed: {}", e))?;
+    
+    // Spawn buffered loggers
+    if let Some(stdout) = child.stdout.take() {
+        spawn_buffered_logger(stdout, log_path.clone());
+    }
+    if let Some(stderr) = child.stderr.take() {
+        spawn_buffered_logger(stderr, log_path); // Log stderr to same file
+    }
+
     let pid = child.id();
     *process_guard = Some(child);
 
@@ -197,6 +258,8 @@ fn get_network_info(app: AppHandle, state: State<NodeState>) -> Result<json::Get
     let client = initialize_rpc_client(&state, &app)?;
     client.get_network_info().map_err(|e| e.to_string())
 }
+
+
 
 #[tauri::command]
 fn get_fee_estimates(app: AppHandle, state: State<NodeState>) -> Result<std::collections::HashMap<String, u64>, String> {
