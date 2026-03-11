@@ -4,5 +4,5 @@
 )]
 
 fn main() {
-    bitcoin_portable::run();
+    bitcoin_portable_lib::run();
 }

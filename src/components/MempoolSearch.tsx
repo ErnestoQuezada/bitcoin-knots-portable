@@ -11,7 +11,7 @@ interface MempoolSearchProps {
 
 const MempoolSearch: React.FC<MempoolSearchProps> = React.memo(({ query, setQuery, onSearch, result, loading, running }) => {
     return (
-        <div className="premium-card">
+        <div className="premium-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <span className="card-label">Mempool & Block Explorer</span>
             <div className="search-wrapper">
                 <input
@@ -49,8 +49,7 @@ const MempoolSearch: React.FC<MempoolSearchProps> = React.memo(({ query, setQuer
                     background: 'rgba(0,0,0,0.2)',
                     borderRadius: '12px',
                     padding: '0.75rem',
-                    minHeight: '60px',
-                    maxHeight: '150px',
+                    flex: 1,
                     overflowY: 'auto'
                 }}
             >

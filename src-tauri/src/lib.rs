@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use tauri::{Manager, Emitter, AppHandle, State};
+use tauri::{AppHandle, State};
 use std::process::{Command, Child, Stdio};
 use std::fs::File;
 use std::sync::{Mutex, Arc};
@@ -30,6 +30,7 @@ struct StatusResponse {
 
 // --- Path Utilities ---
 
+#[allow(unused_variables)]
 fn get_app_root(app: &AppHandle) -> PathBuf {
     #[cfg(mobile)]
     { app.path().app_data_dir().unwrap_or_else(|_| PathBuf::from(".")) }
@@ -121,7 +122,7 @@ fn spawn_buffered_logger<R: Read + Send + 'static>(input: R, path: PathBuf) {
 
 
 #[tauri::command]
-fn start_node(app: AppHandle, state: State<NodeState>) -> Result<StatusResponse, String> {
+async fn start_node(app: AppHandle, state: State<'_, NodeState>) -> Result<StatusResponse, String> {
     let mut process_guard = state.process.lock().map_err(|_| "Lock error")?;
     
     if process_guard.is_some() {
@@ -145,7 +146,44 @@ fn start_node(app: AppHandle, state: State<NodeState>) -> Result<StatusResponse,
     
     let conf_path = data_dir.join("bitcoin.conf");
     if !conf_path.exists() {
-         let config = "server=1\ntxindex=0\nprune=20000\nrpcbind=127.0.0.1\nrpcallowip=127.0.0.1\nshrinkdebugfile=1\nlisten=0\ndisablewallet=1\nupnp=0\nnatpmp=0\nrest=0\n";
+         let config = r#"# --- Core  ---
+server=1
+listen=0
+disablewallet=1
+shrinkdebugfile=1
+upnp=0
+natpmp=0
+rest=0
+
+# --- Pruning ---
+# Decreased to 2000, or keep 20000 if your SSD allows
+prune=2000
+
+# --- Indexing ---
+txindex=0
+
+# --- Network ---
+maxconnections=40
+
+# --- Performance ---
+dbcache=3000
+par=6
+assumevalid=0000000000000000000096695346030999516627632970799440621115809669
+
+# --- Mempool ---
+maxmempool=100
+#mempoolexpiry=336
+#persistmempool=1
+
+# --- Security & RPC ---
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+
+# --- Knots Policy ---
+permitbaremultisig=0
+datacarrier=1
+datacarriersize=80
+"#;
          std::fs::write(&conf_path, config).map_err(|e| e.to_string())?;
     }
     
@@ -162,10 +200,6 @@ fn start_node(app: AppHandle, state: State<NodeState>) -> Result<StatusResponse,
     let mut cmd = Command::new(bin_path);
     cmd.arg(format!("-datadir={}", data_dir.to_string_lossy()))
        .arg(format!("-conf={}", conf_path.to_string_lossy()))
-       // Optimization to reduce resource usage & Antimalware triggers
-       .arg("-dbcache=450")      // Increase memory cache to reduce disk I/O (flush less often)
-       .arg("-maxconnections=40") // Reduce network noise
-       .arg("-par=2")            // Limit verification threads
        .arg("-printtoconsole")   // Output to stdout for buffering
        .stdout(Stdio::piped())   // Capture stdout
        .stderr(Stdio::piped());  // Capture stderr
@@ -173,8 +207,11 @@ fn start_node(app: AppHandle, state: State<NodeState>) -> Result<StatusResponse,
     #[cfg(target_os = "windows")] 
     {
         use std::os::windows::process::CommandExt;
+        // CREATE_NO_WINDOW (0x08000000) prevents console allocation
+        // DETACHED_PROCESS (0x00000008) runs fully disconnected from the parent console ensuring no UI prompts for firewall popups block the background thread
         const CREATE_NO_WINDOW: u32 = 0x08000000;
-        cmd.creation_flags(CREATE_NO_WINDOW);
+        const DETACHED_PROCESS: u32 = 0x00000008;
+        cmd.creation_flags(CREATE_NO_WINDOW | DETACHED_PROCESS);
         
         // On Windows, redirect internal debug.log to NUL to prevent double-writing
         cmd.arg("-debuglogfile=NUL");
@@ -199,7 +236,7 @@ fn start_node(app: AppHandle, state: State<NodeState>) -> Result<StatusResponse,
 }
 
 #[tauri::command]
-fn stop_node(app: AppHandle, state: State<NodeState>) -> Result<String, String> {
+async fn stop_node(app: AppHandle, state: State<'_, NodeState>) -> Result<String, String> {
     if let Ok(client) = initialize_rpc_client(&state, &app) {
         let _ = client.stop();
     }
@@ -233,7 +270,17 @@ fn check_mempool(app: AppHandle, state: State<NodeState>, query: String) -> Resu
     if let Ok(height) = trimmed.parse::<u64>() {
         let hash = client.get_block_hash(height).map_err(|e| e.to_string())?;
         let block = client.get_block_info(&hash).map_err(|e| e.to_string())?;
-        return Ok(format!("HEIGHT: {}\nTX: {}", height, block.n_tx));
+        
+        return Ok(format!(
+            "BLOCK SUMMARY\nHeight: {}\nHash: {}\nTime: {}\nTX Count: {}\nSize: {} KB\nWeight: {} WU\nDifficulty: {:.2}", 
+            height, 
+            &hash.to_string()[..24], // Abbreviate hash
+            block.time,
+            block.n_tx,
+            block.size / 1024,
+            block.weight,
+            block.difficulty
+        ));
     }
 
     if trimmed.len() == 64 && trimmed.chars().all(|c| c.is_ascii_hexdigit()) {

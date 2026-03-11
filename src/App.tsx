@@ -42,20 +42,11 @@ function App() {
         const poll = async () => {
             try {
                 // Fetch data independently to prevent one failure from blocking all updates
-                const net = await fetchNetworkInfo().catch(e => {
-                    console.error("Net info failed:", e);
-                    return null;
-                });
+                const net = await fetchNetworkInfo().catch(() => null);
 
-                const chain = await fetchBlockchainInfo().catch(e => {
-                    console.error("Chain info failed:", e);
-                    return null;
-                });
+                const chain = await fetchBlockchainInfo().catch(() => null);
 
-                const fees = await fetchFeeEstimates().catch(e => {
-                    console.error("Fee estimates failed:", e);
-                    return null;
-                });
+                const fees = await fetchFeeEstimates().catch(() => null);
 
                 setNodeData(prev => ({
                     netInfo: net || prev.netInfo,
@@ -158,14 +149,14 @@ function App() {
                 </div>
             )}
 
-            <header className="header" style={{ padding: isDesktop ? '1rem 1.5rem' : '1.25rem 1.5rem' }}>
+            <header className="header" style={{ padding: '0.25rem 1.5rem', background: 'transparent', backdropFilter: 'none', borderBottom: 'none' }}>
                 <div className="header-logo">
                     <div className="logo-box">
-                        <img src="/knots-logo.svg" className="object-contain" style={{ height: '32px', width: '32px' }} alt="Bitcoin Knots Portable" />
+                        <img src="/knots-logo.svg" className="object-contain" style={{ height: '48px' }} alt="Bitcoin Node" />
                     </div>
                     <div>
-                        <h1 style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>Bitcoin Knots Portable</h1>
-                        <p style={{ fontSize: '10px', color: 'var(--text-dim)', fontFamily: 'monospace' }}>BIP110 ENABLED • MAINNET</p>
+                        <h1 style={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.1 }}>Bitcoin Node</h1>
+                        <p style={{ fontSize: '12px', color: 'var(--text-dim)', fontFamily: 'monospace', letterSpacing: '0.1em' }}>MAINNET</p>
                     </div>
                 </div>
 
@@ -188,15 +179,15 @@ function App() {
                 <div className="desktop-layout">
                     {/* Column 1: Trinity Stack */}
                     <div className="trinity-stack">
-                        <FeeDisplay estimates={nodeData.feeEstimates} />
                         <SyncProgress progress={syncProgressStr} blocks={nodeData.chainInfo?.blocks ?? 0} headers={nodeData.chainInfo?.headers ?? 0} />
-                        <MempoolSearch
-                            query={searchQuery}
-                            setQuery={setSearchQuery}
-                            onSearch={handleSearch}
-                            result={searchResult}
-                            loading={loading}
+                        <FeeDisplay estimates={nodeData.feeEstimates} headers={nodeData.chainInfo?.headers ?? 0} />
+                        <SystemLog
+                            errorInfo={errorInfo}
                             running={running}
+                            chainInfo={nodeData.chainInfo}
+                            blocks={nodeData.chainInfo?.blocks ?? 0}
+                            logContent={logContent}
+                            onClearLog={handleClearLog}
                         />
                     </div>
 
@@ -206,15 +197,14 @@ function App() {
                             <PeersDisplay peers={nodeData.netInfo?.connections ?? 0} />
                             <StorageInfo diskSize={diskSize} pruned={nodeData.chainInfo?.pruned ?? false} />
                         </div>
-                        <div style={{ flex: 1, minHeight: 0 }}>
-                            <SystemLog
-                                errorInfo={errorInfo}
+                        <div style={{ flex: 1, minHeight: 0, width: '100%' }}>
+                            <MempoolSearch
+                                query={searchQuery}
+                                setQuery={setSearchQuery}
+                                onSearch={handleSearch}
+                                result={searchResult}
+                                loading={loading}
                                 running={running}
-                                chainInfo={nodeData.chainInfo}
-                                blocks={nodeData.chainInfo?.blocks ?? 0}
-                                onViewLog={handleViewLog}
-                                logContent={logContent}
-                                onClearLog={handleClearLog}
                             />
                         </div>
                     </div>
@@ -223,10 +213,10 @@ function App() {
 
             <footer className="footer">
                 <div className="footer-left">
-                    <span className="footer-version-label">v0.2.5</span>
+                    <span className="footer-version-label">v0.2.7</span>
                 </div>
                 <div className="footer-right">
-                    Bitcoin Knots Portable (BIP110)
+                    Portable Bitcoin Node
                 </div>
             </footer>
         </div>

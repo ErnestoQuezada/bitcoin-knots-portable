@@ -2,9 +2,13 @@ import React from 'react';
 
 interface FeeDisplayProps {
     estimates: Record<string, number> | null;
+    headers: number;
 }
 
-const FeeDisplay: React.FC<FeeDisplayProps> = React.memo(({ estimates }) => {
+const FeeDisplay: React.FC<FeeDisplayProps> = React.memo(({ estimates, headers }) => {
+    const activationTarget = 965664;
+    const blocksToActivation = activationTarget - headers;
+
     return (
         <div className="premium-card">
             <span className="card-label">Transaction Fees</span>

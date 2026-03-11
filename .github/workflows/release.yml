@@ -37,3 +37,4 @@ jobs:
           releaseBody: "Automated build for Bitcoin Knots Portable."
           releaseDraft: true
           prerelease: false
+          args: "--no-bundle"

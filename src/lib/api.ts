@@ -11,7 +11,6 @@ const loadMockData = async () => {
             const response = await fetch('/mock_data.json'); // Served from public folder or similar
             mockData = await response.json();
         } catch (e) {
-            console.warn("Failed to load mock data, using fallback", e);
             mockData = {
                 getblockchaininfo: { blocks: 1000, headers: 1000, verificationprogress: 0.5 },
                 getnetworkinfo: { connections: 8 },
@@ -23,12 +22,12 @@ const loadMockData = async () => {
 };
 
 export const startNode = async (): Promise<any> => {
-    if (MOCK_MODE) { console.log("MOCK: startNode"); return { running: true, pid: 1234, message: "Mock Started" }; }
+    if (MOCK_MODE) { return { running: true, pid: 1234, message: "Mock Started" }; }
     return invoke('start_node');
 };
 
 export const stopNode = async (): Promise<any> => {
-    if (MOCK_MODE) { console.log("MOCK: stopNode"); return "Stopped"; }
+    if (MOCK_MODE) { return "Stopped"; }
     return invoke('stop_node');
 };
 
@@ -59,17 +58,17 @@ export const checkMempool = async (query: string): Promise<string> => {
 };
 
 export const closeWindow = async (): Promise<void> => {
-    if (MOCK_MODE) { console.log("MOCK: closeWindow"); return; }
+    if (MOCK_MODE) { return; }
     return invoke('close_window');
 };
 
 export const minimizeWindow = async (): Promise<void> => {
-    if (MOCK_MODE) { console.log("MOCK: minimizeWindow"); return; }
+    if (MOCK_MODE) { return; }
     return invoke('minimize_window');
 };
 
 export const maximizeWindow = async (): Promise<void> => {
-    if (MOCK_MODE) { console.log("MOCK: maximizeWindow"); return; }
+    if (MOCK_MODE) { return; }
     return invoke('maximize_window');
 };
 

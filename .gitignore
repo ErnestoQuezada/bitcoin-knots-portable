@@ -31,3 +31,10 @@ test_extract/
 .env.*
 run-test.bat
 src-tauri/gen/
+
+# Reports & Scripts (Not necessary for build)
+BLOAT_REPORT.md
+MINIMALIST_SYSTEMS_REPORT.md
+BUILD.md
+README_DIST.txt
+package.ps1

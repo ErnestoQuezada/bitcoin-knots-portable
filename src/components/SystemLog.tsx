@@ -15,7 +15,7 @@ const SystemLog: React.FC<SystemLogProps> = React.memo(({ errorInfo, running, ch
         <div
             className="custom-scrollbar"
             style={{
-                background: '#090909',
+                background: 'var(--bg-card)',
                 borderRadius: '16px',
                 padding: '1rem',
                 border: '1px solid var(--border-subtle)',
@@ -42,28 +42,14 @@ const SystemLog: React.FC<SystemLogProps> = React.memo(({ errorInfo, running, ch
                 ) : (
                     <>
                         {errorInfo && (
-                            <div style={{ 
-                                color: errorInfo.includes('Busy') || errorInfo.includes('Connecting') ? 'var(--accent)' : 'var(--danger)', 
-                                background: errorInfo.includes('Busy') || errorInfo.includes('Connecting') ? 'rgba(247, 147, 26, 0.05)' : 'rgba(239, 68, 68, 0.05)', 
-                                padding: '0.75rem', 
-                                borderRadius: '8px', 
-                                borderLeft: `2px solid ${errorInfo.includes('Busy') || errorInfo.includes('Connecting') ? 'var(--accent)' : 'var(--danger)'}` 
+                            <div style={{
+                                color: errorInfo.includes('Busy') || errorInfo.includes('Connecting') ? 'var(--accent)' : 'var(--danger)',
+                                background: errorInfo.includes('Busy') || errorInfo.includes('Connecting') ? 'rgba(247, 147, 26, 0.05)' : 'rgba(239, 68, 68, 0.05)',
+                                padding: '0.75rem',
+                                borderRadius: '8px',
+                                borderLeft: `2px solid ${errorInfo.includes('Busy') || errorInfo.includes('Connecting') ? 'var(--accent)' : 'var(--danger)'}`
                             }}>
                                 [{errorInfo.includes('Busy') || errorInfo.includes('Connecting') ? 'INFO' : 'ERROR'}] {errorInfo}
-                                {onViewLog && (
-                                    <div
-                                        onClick={onViewLog}
-                                        style={{
-                                            marginTop: '0.5rem',
-                                            fontSize: '0.6rem',
-                                            textDecoration: 'underline',
-                                            cursor: 'pointer',
-                                            opacity: 0.8
-                                        }}
-                                    >
-                                        View System Log &gt;
-                                    </div>
-                                )}
                             </div>
                         )}
                         {!running && (
@@ -74,7 +60,6 @@ const SystemLog: React.FC<SystemLogProps> = React.memo(({ errorInfo, running, ch
                         {running && !errorInfo && !chainInfo && (
                             <div style={{ color: 'var(--accent)' }}>
                                 <span style={{ color: 'var(--accent)', opacity: 0.5 }}>&gt;</span> Spawning bitcoind process...
-                                {onViewLog && <span onClick={onViewLog} style={{ marginLeft: '10px', fontSize: '0.6rem', textDecoration: 'underline', cursor: 'pointer', color: 'var(--text-dim)' }}>View Log</span>}
                             </div>
                         )}
                         {chainInfo && (

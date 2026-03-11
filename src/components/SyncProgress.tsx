@@ -1,44 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
-
-// Custom hook for number interpolation
-const useAnimatedNumber = (value: number, duration: number = 3000) => {
-    const [displayValue, setDisplayValue] = useState(value);
-    const startTimeRef = useRef<number | null>(null);
-    const startValueRef = useRef<number>(value);
-    const requestRef = useRef<number | null>(null);
-
-    useEffect(() => {
-        if (value === displayValue) return;
-
-        startValueRef.current = displayValue;
-        startTimeRef.current = null;
-
-        const animate = (time: number) => {
-            if (startTimeRef.current === null) startTimeRef.current = time;
-            const elapsed = time - startTimeRef.current;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Ease out quart: 1 - (1 - t)^4
-            const ease = 1 - Math.pow(1 - progress, 4);
-
-            const current = startValueRef.current + (value - startValueRef.current) * ease;
-
-            setDisplayValue(Math.floor(current));
-
-            if (progress < 1) {
-                requestRef.current = requestAnimationFrame(animate);
-            }
-        };
-
-        requestRef.current = requestAnimationFrame(animate);
-
-        return () => {
-            if (requestRef.current) cancelAnimationFrame(requestRef.current);
-        };
-    }, [value, duration]); // Removed displayValue from dependencies to avoid loop
-
-    return displayValue;
-};
+import React from 'react';
 
 interface SyncProgressProps {
     progress: string;
@@ -47,18 +7,6 @@ interface SyncProgressProps {
 }
 
 const SyncProgress: React.FC<SyncProgressProps> = React.memo(({ progress, blocks, headers }) => {
-    const animatedBlocks = useAnimatedNumber(blocks);
-    const animatedHeaders = useAnimatedNumber(headers);
-    const [highlight, setHighlight] = useState(false);
-
-    useEffect(() => {
-        if (blocks > 0) {
-            setHighlight(true);
-            const timer = setTimeout(() => setHighlight(false), 2000);
-            return () => clearTimeout(timer);
-        }
-    }, [blocks]);
-
     return (
         <div className="premium-card">
             <span className="card-label">Synchronization</span>
@@ -79,8 +27,8 @@ const SyncProgress: React.FC<SyncProgressProps> = React.memo(({ progress, blocks
                 ></div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span className={`sub-stat ${highlight ? 'highlight-pulse' : ''}`} style={{ transition: 'color 0.5s', color: highlight ? '#F7931A' : 'var(--text-dim)' }}>BLOCKS: {animatedBlocks.toLocaleString()}</span>
-                <span className="sub-stat">HEADERS: {animatedHeaders.toLocaleString()}</span>
+                <span className="sub-stat">BLOCKS: {blocks.toLocaleString()}</span>
+                <span className="sub-stat">HEADERS: {headers.toLocaleString()}</span>
             </div>
         </div>
     );

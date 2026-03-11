@@ -14,7 +14,7 @@ Sovereign Node. Silent Sync. Zero Compromise.
 
 Author  : Acreonte (LNAddress: acreonte@blink.sv)
 
-Version : 0.2.5 (BIP110 Support)
+Version : 0.2.7 (BIP110 Support)
 
 Network : Bitcoin Mainnet
 
@@ -46,7 +46,7 @@ QUICK START
    The node starts automatically in the background.
 
 3) Sync
-   The blue progress bar shows initial block download.
+   The yellow progress bar shows initial block download.
    First sync may take time. Sovereignty isn't instant.
 
 

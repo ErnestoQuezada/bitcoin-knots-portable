@@ -1,12 +1,12 @@
 [package]
-name = "bitcoin_portable"
-version = "0.2.5"
+name = "bitcoin-portable"
+version = "0.2.7"
 description = "Minimalist Bitcoin Knots Node Wrapper"
 authors = ["Acreonte"]
 edition = "2021"
 
 [lib]
-name = "bitcoin_portable"
+name = "bitcoin_portable_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
