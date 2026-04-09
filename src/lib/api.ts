@@ -14,7 +14,7 @@ const loadMockData = async () => {
             mockData = {
                 getblockchaininfo: { blocks: 1000, headers: 1000, verificationprogress: 0.5 },
                 getnetworkinfo: { connections: 8 },
-                fee_estimates: { "2": 50, "6": 40, "144": 10 }
+                peerinfo: []
             };
         }
     }
@@ -49,12 +49,17 @@ export const fetchNetworkInfo = async (): Promise<any> => {
 
 
 
-export const checkMempool = async (query: string): Promise<string> => {
+export const fetchPeerInfo = async (): Promise<any> => {
     if (MOCK_MODE) {
         const data = await loadMockData();
-        return data.check_mempool_result || "Mock Result";
+        return data.peerinfo || [];
     }
-    return invoke('check_mempool', { query });
+    return invoke('get_peer_info');
+};
+
+export const addNode = async (addr: String): Promise<any> => {
+    if (MOCK_MODE) { return "Added"; }
+    return invoke('add_node', { addr });
 };
 
 export const closeWindow = async (): Promise<void> => {
@@ -72,13 +77,7 @@ export const maximizeWindow = async (): Promise<void> => {
     return invoke('maximize_window');
 };
 
-export const fetchFeeEstimates = async (): Promise<Record<string, number>> => {
-    if (MOCK_MODE) {
-        const data = await loadMockData();
-        return data.fee_estimates;
-    }
-    return invoke('get_fee_estimates');
-};
+
 
 export const getNodeLog = async (): Promise<string> => {
     if (MOCK_MODE) return "MOCK LOG: Node is running in test mode.\nBlock verification progress: 99.9%";

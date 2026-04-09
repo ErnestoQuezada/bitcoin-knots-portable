@@ -1,11 +1,8 @@
-import { startNode, stopNode, fetchBlockchainInfo, fetchNetworkInfo, checkMempool, fetchFeeEstimates, closeWindow, minimizeWindow, maximizeWindow, getNodeLog } from './lib/api';
+import { startNode, stopNode, fetchBlockchainInfo, fetchNetworkInfo, fetchPeerInfo, closeWindow, minimizeWindow, maximizeWindow, getNodeLog } from './lib/api';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import './minimal.css';
 
-// Components
-import FeeDisplay from './components/FeeDisplay';
 import SyncProgress from './components/SyncProgress';
-import MempoolSearch from './components/MempoolSearch';
 import SystemLog from './components/SystemLog';
 import PeersDisplay from './components/PeersDisplay';
 import StorageInfo from './components/StorageInfo';
@@ -13,16 +10,14 @@ import StorageInfo from './components/StorageInfo';
 interface NodeData {
     chainInfo: any;
     netInfo: any;
-    feeEstimates: Record<string, number> | null;
+    peerInfo: any[] | null;
 }
 
 function App() {
     const [running, setRunning] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errorInfo, setErrorInfo] = useState<string | null>(null);
-    const [nodeData, setNodeData] = useState<NodeData>({ chainInfo: null, netInfo: null, feeEstimates: null });
-    const [searchQuery, setSearchQuery] = useState("");
-    const [searchResult, setSearchResult] = useState<string | null>(null);
+    const [nodeData, setNodeData] = useState<NodeData>({ chainInfo: null, netInfo: null, peerInfo: null });
     const [isVisible, setIsVisible] = useState(true);
     const [logContent, setLogContent] = useState<string | null>(null);
 
@@ -43,15 +38,13 @@ function App() {
             try {
                 // Fetch data independently to prevent one failure from blocking all updates
                 const net = await fetchNetworkInfo().catch(() => null);
-
                 const chain = await fetchBlockchainInfo().catch(() => null);
-
-                const fees = await fetchFeeEstimates().catch(() => null);
+                const peers = await fetchPeerInfo().catch(() => null);
 
                 setNodeData(prev => ({
                     netInfo: net || prev.netInfo,
                     chainInfo: chain || prev.chainInfo,
-                    feeEstimates: fees || prev.feeEstimates
+                    peerInfo: peers || prev.peerInfo
                 }));
 
                 // Only show error if core connectivity is missing
@@ -88,7 +81,7 @@ function App() {
         try {
             await stopNode();
             setRunning(false);
-            setNodeData({ chainInfo: null, netInfo: null, feeEstimates: null });
+            setNodeData({ chainInfo: null, netInfo: null, peerInfo: null });
         } catch (e: any) {
             setErrorInfo(`Error: ${e}`);
         } finally {
@@ -96,18 +89,7 @@ function App() {
         }
     };
 
-    const handleSearch = useCallback(async () => {
-        if (!searchQuery.trim()) return;
-        setLoading(true);
-        try {
-            const res = await checkMempool(searchQuery);
-            setSearchResult(res);
-        } catch (e: any) {
-            setSearchResult(`Error: ${e}`);
-        } finally {
-            setLoading(false);
-        }
-    }, [searchQuery]);
+
 
     const handleViewLog = async () => {
         try {
@@ -177,10 +159,10 @@ function App() {
 
             <main className="main-content">
                 <div className="desktop-layout">
-                    {/* Column 1: Trinity Stack */}
+                    {/* Column 1: Sync, Node Info & Logs */}
                     <div className="trinity-stack">
                         <SyncProgress progress={syncProgressStr} blocks={nodeData.chainInfo?.blocks ?? 0} headers={nodeData.chainInfo?.headers ?? 0} />
-                        <FeeDisplay estimates={nodeData.feeEstimates} headers={nodeData.chainInfo?.headers ?? 0} />
+                        <StorageInfo diskSize={diskSize} pruned={nodeData.chainInfo?.pruned ?? false} localAddresses={nodeData.netInfo?.localaddresses} />
                         <SystemLog
                             errorInfo={errorInfo}
                             running={running}
@@ -191,29 +173,16 @@ function App() {
                         />
                     </div>
 
-                    {/* Column 2: Storage & Logs */}
-                    <div className="layout-column">
-                        <div className="horizontal-split" style={{ height: '33.33%' }}>
-                            <PeersDisplay peers={nodeData.netInfo?.connections ?? 0} />
-                            <StorageInfo diskSize={diskSize} pruned={nodeData.chainInfo?.pruned ?? false} />
-                        </div>
-                        <div style={{ flex: 1, minHeight: 0, width: '100%' }}>
-                            <MempoolSearch
-                                query={searchQuery}
-                                setQuery={setSearchQuery}
-                                onSearch={handleSearch}
-                                result={searchResult}
-                                loading={loading}
-                                running={running}
-                            />
-                        </div>
+                    {/* Column 2: Active Peers */}
+                    <div className="trinity-stack">
+                        <PeersDisplay peers={nodeData.netInfo?.connections ?? 0} peerInfo={nodeData.peerInfo} />
                     </div>
                 </div>
             </main>
 
             <footer className="footer">
                 <div className="footer-left">
-                    <span className="footer-version-label">v0.2.7</span>
+                    <span className="footer-version-label">v0.2.8</span>
                 </div>
                 <div className="footer-right">
                     Portable Bitcoin Node

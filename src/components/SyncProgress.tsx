@@ -8,7 +8,7 @@ interface SyncProgressProps {
 
 const SyncProgress: React.FC<SyncProgressProps> = React.memo(({ progress, blocks, headers }) => {
     return (
-        <div className="premium-card">
+        <div className="premium-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <span className="card-label">Synchronization</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '1.25rem' }}>
                 <span className="big-stat">{progress}%</span>

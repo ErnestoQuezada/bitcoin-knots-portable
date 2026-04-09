@@ -8,6 +8,8 @@ jobs:
   release:
     permissions:
       contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +21,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -38,3 +40,4 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: "--no-bundle"
+          includeRelease: true

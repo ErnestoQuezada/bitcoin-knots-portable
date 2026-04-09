@@ -8,6 +8,7 @@ src-tauri/target/
 
 # Binaries and Large Data
 bin/bitcoind.exe
+bin/tor.exe
 data/
 logs/
 
