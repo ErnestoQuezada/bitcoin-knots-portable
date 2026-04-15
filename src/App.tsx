@@ -113,6 +113,12 @@ function App() {
         return gb.toFixed(2) + " GB";
     }, [nodeData.chainInfo]);
 
+    const targetSize = useMemo(() => {
+        if (!nodeData.chainInfo?.prune_target_size) return "--";
+        const gb = nodeData.chainInfo.prune_target_size / (1024 * 1024 * 1024);
+        return gb.toFixed(2) + " GB";
+    }, [nodeData.chainInfo]);
+
     return (
         <div className="app-container">
             {isDesktop && (
@@ -162,7 +168,7 @@ function App() {
                     {/* Column 1: Sync, Node Info & Logs */}
                     <div className="trinity-stack">
                         <SyncProgress progress={syncProgressStr} blocks={nodeData.chainInfo?.blocks ?? 0} headers={nodeData.chainInfo?.headers ?? 0} />
-                        <StorageInfo diskSize={diskSize} pruned={nodeData.chainInfo?.pruned ?? false} localAddresses={nodeData.netInfo?.localaddresses} />
+                        <StorageInfo diskSize={diskSize} targetSize={targetSize} pruned={nodeData.chainInfo?.pruned ?? false} />
                         <SystemLog
                             errorInfo={errorInfo}
                             running={running}
@@ -175,14 +181,18 @@ function App() {
 
                     {/* Column 2: Active Peers */}
                     <div className="trinity-stack">
-                        <PeersDisplay peers={nodeData.netInfo?.connections ?? 0} peerInfo={nodeData.peerInfo} />
+                        <PeersDisplay 
+                            peers={nodeData.netInfo?.connections ?? 0} 
+                            peerInfo={nodeData.peerInfo} 
+                            localAddresses={nodeData.netInfo?.localaddresses}
+                        />
                     </div>
                 </div>
             </main>
 
             <footer className="footer">
                 <div className="footer-left">
-                    <span className="footer-version-label">v0.2.8</span>
+                    <span className="footer-version-label">v0.2.9</span>
                 </div>
                 <div className="footer-right">
                     Portable Bitcoin Node

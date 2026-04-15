@@ -7,28 +7,54 @@ interface SyncProgressProps {
 }
 
 const SyncProgress: React.FC<SyncProgressProps> = React.memo(({ progress, blocks, headers }) => {
+    const isHeaderSync = headers > blocks + 10 && parseFloat(progress) < 0.1;
+    
+    // Estimate total headers if we don't have them (current network is ~840k)
+    const estimatedTotalHeaders = Math.max(headers, 840000);
+    const headerProgress = Math.min((headers / estimatedTotalHeaders) * 100, 99.9);
+    
     return (
         <div className="premium-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <span className="card-label">Synchronization</span>
+            
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                <span className="big-stat">{progress}%</span>
-                <span className="sub-stat">PROCESSED</span>
+                {isHeaderSync ? (
+                    <>
+                        <span className="big-stat" style={{ color: 'var(--text-dim)', fontSize: '1.25rem' }}>HEADER SYNC</span>
+                        <span className="sub-stat" style={{ color: 'var(--accent)' }}>{headers.toLocaleString()}</span>
+                    </>
+                ) : (
+                    <>
+                        <span className="big-stat">{progress}%</span>
+                        <span className="sub-stat">PROCESSED</span>
+                    </>
+                )}
             </div>
 
             <div style={{ width: '100%', background: '#090909', borderRadius: '10px', height: '6px', overflow: 'hidden', marginBottom: '0.75rem' }}>
                 <div
                     style={{
-                        width: `${progress}%`,
-                        background: 'linear-gradient(90deg, #F7931A 0%, #FFAD42 100%)',
+                        width: isHeaderSync ? `${headerProgress}%` : `${progress}%`,
+                        background: isHeaderSync 
+                            ? 'linear-gradient(90deg, #94A3B8 0%, #FFFFFF 100%)' 
+                            : 'linear-gradient(90deg, #F7931A 0%, #FFAD42 100%)',
                         height: '100%',
                         borderRadius: '10px',
-                        transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                        transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                        opacity: isHeaderSync ? 0.5 : 1
                     }}
                 ></div>
             </div>
+
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span className="sub-stat">BLOCKS: {blocks.toLocaleString()}</span>
-                <span className="sub-stat">HEADERS: {headers.toLocaleString()}</span>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>BLOCKS</span>
+                    <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', fontWeight: 'bold' }}>{blocks.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>HEADERS</span>
+                    <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--accent)' }}>{headers.toLocaleString()}</span>
+                </div>
             </div>
         </div>
     );

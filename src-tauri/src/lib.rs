@@ -156,31 +156,44 @@ async fn start_node(app: AppHandle, state: State<'_, NodeState>) -> Result<Statu
     
     let conf_path = data_dir.join("bitcoin.conf");
     if !conf_path.exists() {
-         let config = r#"# --- Core ---
+          let config = r#"# --- Core ---
 server=1
 listen=1
+discover=1
 disablewallet=1
 shrinkdebugfile=1
-upnp=1
-natpmp=1
+upnp=0
+natpmp=0
 rest=0
 
 # --- Pruning ---
-prune=2000
+prune=5000
+
+# --- Indexing ---
+txindex=0
 
 # --- Network ---
-maxconnections=40
+maxconnections=60
 listenonion=1
 proxy=127.0.0.1:9050
 
-# --- Performance ---
-dbcache=3000
+# --- Performance (Tailored for 8GB RAM) ---
+dbcache=600
 par=6
 assumevalid=0000000000000000000096695346030999516627632970799440621115809669
+
+# --- Mempool ---
+maxmempool=150
 
 # --- Security & RPC ---
 rpcbind=127.0.0.1
 rpcallowip=127.0.0.1
+
+# --- Knots Policy ---
+permitbaremultisig=0
+datacarrier=1
+datacarriersize=80
+rejecttokens=1
 "#;
          std::fs::write(&conf_path, config).map_err(|e| e.to_string())?;
     }
