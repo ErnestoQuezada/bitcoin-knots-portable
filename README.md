@@ -1,20 +1,11 @@
-```
-███████╗██╗██╗     ████████╗███████╗██████╗ ███████╗     ██╗   ██╗██████╗ 
-██╔════╝██║██║     ╚══██╔══╝██╔════╝██╔══██╗██╔════╝     ██║   ██║██╔══██╗
-█████╗  ██║██║        ██║   █████╗  ██████╔╝███████╗     ██║   ██║██████╔╝
-██╔══╝  ██║██║        ██║   ██╔══╝  ██╔══██╗╚════██║     ██║   ██║██╔═══╝ 
-██║     ██║███████╗   ██║   ███████╗██║  ██║███████║     ╚██████╔╝██║     
-╚═╝     ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝      ╚═════╝ ╚═╝     
-```
-
-# ₿ BITCOIN KNOTS PORTABLE
+# PORTABLE ₿ BITCOIN NODE
 
 Sovereign Node. Silent Sync. Zero Compromise.
 ------------------------------------------------------------
 
 Author  : Acreonte (LNAddress: acreonte@blink.sv)
 
-Version : 0.2.8 (BIP110 Support)
+Version : 0.3.0 
 
 Network : Bitcoin Mainnet
 
@@ -23,7 +14,7 @@ Ethos   : Verify. Don't Trust.
 
 WELCOME
 ------------------------------------------------------------
-Bitcoin Knots Portable is a lightweight, hardened, privacy-focused
+Bitcoin Portable is a lightweight, hardened, privacy-focused
 Bitcoin node wrapper designed to run directly from a folder
 or USB drive.
 
@@ -98,7 +89,7 @@ FOLDER STRUCTURE
 ------------------------------------------------------------
 
 bitcoin-portable.exe     -> Launcher
-bin/bitcoind.exe         -> Bitcoin Knots binary
+bin/bitcoind.exe         -> Bitcoin binary
 data/                    -> Blockchain data (delete = re-sync)
 logs/                    -> Application logs
 
