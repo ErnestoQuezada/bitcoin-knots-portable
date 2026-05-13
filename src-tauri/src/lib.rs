@@ -132,6 +132,27 @@ async fn start_node(app: AppHandle, state: State<'_, NodeState>) -> Result<Statu
         return Ok(StatusResponse { running: true, pid: None, message: "Running".into() });
     }
 
+    // --- Kill existing instances to prevent lock errors ---
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        let _ = Command::new("taskkill")
+            .args(&["/F", "/IM", "bitcoind.exe"])
+            .creation_flags(CREATE_NO_WINDOW)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status();
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = Command::new("killall")
+            .arg("bitcoind")
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status();
+    }
+
     let root = get_app_root(&app);
     let bin_path_candidates = [
         root.join("bin/bitcoind.exe"),

@@ -73,7 +73,7 @@ const SystemLog: React.FC<SystemLogProps> = React.memo(({ errorInfo, running, ch
                                     </div>
                                 )}
                                 <div style={{ color: 'var(--text-dim)', fontSize: '0.65rem' }}>
-                                    &gt; Verification progress: {(chainInfo.verificationprogress * 100).toFixed(4)}%
+                                    &gt; Verification progress: {chainInfo.blocks === chainInfo.headers && chainInfo.headers > 0 ? "100.0000" : (chainInfo.verificationprogress * 100).toFixed(4)}%
                                 </div>
                                 <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: '0.6rem' }}>
                                     TIMESTAMP: {new Date().toLocaleTimeString()}
