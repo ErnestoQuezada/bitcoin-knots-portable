@@ -1,14 +1,14 @@
 {
   "name": "bitcoin-portable",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "build:portable": "tauri build && copy src-tauri\\target\\release\\bitcoin-portable.exe release\\ && copy bin\\tor.exe release\\bin\\"
+    "build:portable": "tauri build && copy src-tauri\\target\\release\\bitcoin-portable.exe release\\ && copy src-tauri\\target\\release\\bitcoin-cli.exe bin\\ && copy src-tauri\\target\\release\\bitcoin-cli.exe release\\bin\\ && copy bin\\tor.exe release\\bin\\"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",

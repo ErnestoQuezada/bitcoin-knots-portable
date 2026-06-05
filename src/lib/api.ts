@@ -83,3 +83,22 @@ export const getNodeLog = async (): Promise<string> => {
     if (MOCK_MODE) return "MOCK LOG: Node is running in test mode.\nBlock verification progress: 99.9%";
     return invoke('get_node_log');
 };
+
+export const checkRpcCredentialsSet = async (): Promise<boolean> => {
+    if (MOCK_MODE) {
+        return localStorage.getItem('rpc_credentials_set') === 'true';
+    }
+    return invoke('check_rpc_credentials_set');
+};
+
+export const setRpcCredentials = async (username: string, password: string): Promise<any> => {
+    if (MOCK_MODE) {
+        if (!username.trim() || !password.trim()) {
+            throw new Error("Username and password cannot be empty");
+        }
+        localStorage.setItem('rpc_credentials_set', 'true');
+        return;
+    }
+    return invoke('set_rpc_credentials', { username, password });
+};
+

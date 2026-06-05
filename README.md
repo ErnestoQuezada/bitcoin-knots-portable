@@ -5,7 +5,7 @@ Sovereign Node. Silent Sync. Zero Compromise.
 
 Author  : Acreonte (LNAddress: acreonte@blink.sv)
 
-Version : 0.3.0 
+Version : 0.3.1
 
 Network : Bitcoin Mainnet
 
@@ -56,8 +56,6 @@ No system-level dependency.
 
 
 [ SECURITY MODEL ]
-- No incoming connections (silent node)
-- No firewall prompts
 - Local RPC only
 - Wallet functionality DISABLED by default
 
@@ -67,6 +65,11 @@ Minimal attack surface. Maximum signal integrity.
 
 TROUBLESHOOTING
 ------------------------------------------------------------
+
+Windows Security / Smart App Control / SmartScreen
+   Windows may block the executable for security reasons because it is unsigned.
+   Refer to [WINDOWS_TROUBLESHOOTING.md](WINDOWS_TROUBLESHOOTING.md) for how to
+   unblock the file or configure your system to allow it.
 
 "Connection lost"
    The node may be restarting or initializing.

@@ -1,4 +1,4 @@
-import { startNode, stopNode, fetchBlockchainInfo, fetchNetworkInfo, fetchPeerInfo, closeWindow, minimizeWindow, maximizeWindow, getNodeLog } from './lib/api';
+import { startNode, stopNode, fetchBlockchainInfo, fetchNetworkInfo, fetchPeerInfo, closeWindow, minimizeWindow, maximizeWindow, getNodeLog, checkRpcCredentialsSet } from './lib/api';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import './minimal.css';
 
@@ -6,6 +6,8 @@ import SyncProgress from './components/SyncProgress';
 import SystemLog from './components/SystemLog';
 import PeersDisplay from './components/PeersDisplay';
 import StorageInfo from './components/StorageInfo';
+import SetupCredentials from './components/SetupCredentials';
+
 
 interface NodeData {
     chainInfo: any;
@@ -20,8 +22,23 @@ function App() {
     const [nodeData, setNodeData] = useState<NodeData>({ chainInfo: null, netInfo: null, peerInfo: null });
     const [isVisible, setIsVisible] = useState(true);
     const [logContent, setLogContent] = useState<string | null>(null);
+    const [credentialsSet, setCredentialsSet] = useState<boolean | null>(null);
 
     const isDesktop = useMemo(() => !navigator.userAgent.includes('Android') && !navigator.userAgent.includes('Mobi'), []);
+
+    // Lifecycle to check if RPC credentials are set
+    useEffect(() => {
+        const checkCredentials = async () => {
+            try {
+                const isSet = await checkRpcCredentialsSet();
+                setCredentialsSet(isSet);
+            } catch (e) {
+                console.error("Failed to check RPC credentials:", e);
+                setCredentialsSet(false);
+            }
+        };
+        checkCredentials();
+    }, []);
 
     // Lifecycle
     useEffect(() => {
@@ -119,6 +136,21 @@ function App() {
         return gb.toFixed(2) + " GB";
     }, [nodeData.chainInfo]);
 
+    if (credentialsSet === null) {
+        return (
+            <div className="setup-container">
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                    <img src="/knots-logo.svg" style={{ height: '48px', animation: 'pulse 1.5s infinite' }} alt="Loading" />
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontFamily: 'monospace' }}>INITIALIZING NODE CONTROLLER...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (!credentialsSet) {
+        return <SetupCredentials onSetupComplete={() => setCredentialsSet(true)} />;
+    }
+
     return (
         <div className="app-container">
             {isDesktop && (
@@ -192,7 +224,7 @@ function App() {
 
             <footer className="footer">
                 <div className="footer-left">
-                    <span className="footer-version-label">v0.3.0</span>
+                    <span className="footer-version-label">v0.3.1</span>
                 </div>
                 <div className="footer-right">
                     Portable Bitcoin Node

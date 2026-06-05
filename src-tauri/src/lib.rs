@@ -54,7 +54,60 @@ fn get_data_dir(app: &AppHandle) -> PathBuf {
     get_app_root(app).join("data")
 }
 
+// --- Windows Security Helper ---
+
+#[cfg(target_os = "windows")]
+fn unblock_file(path: &std::path::Path) {
+    if let Some(path_str) = path.to_str() {
+        let ads_path = format!("{}:Zone.Identifier", path_str);
+        let ads_path_buf = std::path::PathBuf::from(ads_path);
+        if ads_path_buf.exists() {
+            let _ = std::fs::remove_file(ads_path_buf);
+        }
+    }
+}
+
 // --- RPC Client Helper ---
+
+fn get_rpc_credentials_from_conf(app: &AppHandle) -> Option<(String, String)> {
+    let data_dir = get_data_dir(app);
+    let conf_path = data_dir.join("bitcoin.conf");
+    if !conf_path.exists() {
+        return None;
+    }
+    
+    let file = File::open(&conf_path).ok()?;
+    let reader = BufReader::new(file);
+    let mut username = None;
+    let mut password = None;
+    
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            let trimmed = line.trim();
+            if trimmed.starts_with("rpcuser=") {
+                if let Some(val) = trimmed.split('=').nth(1) {
+                    let val = val.trim();
+                    if !val.is_empty() {
+                        username = Some(val.to_string());
+                    }
+                }
+            }
+            if trimmed.starts_with("rpcpassword=") {
+                if let Some(val) = trimmed.split('=').nth(1) {
+                    let val = val.trim();
+                    if !val.is_empty() {
+                        password = Some(val.to_string());
+                    }
+                }
+            }
+        }
+    }
+    
+    match (username, password) {
+        (Some(u), Some(p)) => Some((u, p)),
+        _ => None,
+    }
+}
 
 fn initialize_rpc_client(state: &NodeState, app: &AppHandle) -> Result<Arc<Client>, String> {
     let mut client_guard = state.rpc_client.lock().map_err(|_| "Lock error")?;
@@ -64,14 +117,18 @@ fn initialize_rpc_client(state: &NodeState, app: &AppHandle) -> Result<Arc<Clien
     }
 
     let data_dir = get_data_dir(app);
-    let cookie_path = data_dir.join(".cookie");
-    
-    if !cookie_path.exists() {
-        return Err("Cookie not found. Node initializing?".into());
-    }
-    
     let rpc_url = "http://127.0.0.1:8332";
-    let auth = Auth::CookieFile(cookie_path);
+    
+    let auth = if let Some((u, p)) = get_rpc_credentials_from_conf(app) {
+        Auth::UserPass(u, p)
+    } else {
+        let cookie_path = data_dir.join(".cookie");
+        if !cookie_path.exists() {
+            return Err("Cookie not found. Node initializing?".into());
+        }
+        Auth::CookieFile(cookie_path)
+    };
+
     let client = Client::new(rpc_url, auth).map_err(|e| format!("RPC Error: {}", e))?;
     
     let arc_client = Arc::new(client);
@@ -79,6 +136,88 @@ fn initialize_rpc_client(state: &NodeState, app: &AppHandle) -> Result<Arc<Clien
     
     Ok(arc_client)
 }
+
+#[tauri::command]
+fn check_rpc_credentials_set(app: AppHandle) -> Result<bool, String> {
+    Ok(get_rpc_credentials_from_conf(&app).is_some())
+}
+
+#[tauri::command]
+fn set_rpc_credentials(app: AppHandle, username: String, password: String) -> Result<(), String> {
+    let u = username.trim();
+    let p = password.trim();
+    if u.is_empty() || p.is_empty() {
+        return Err("Username and password cannot be empty".into());
+    }
+
+    let data_dir = get_data_dir(&app);
+    if !data_dir.exists() {
+        std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
+    }
+    
+    let conf_path = data_dir.join("bitcoin.conf");
+    let config_content = if conf_path.exists() {
+        std::fs::read_to_string(&conf_path).map_err(|e| e.to_string())?
+    } else {
+        r#"# --- Core ---
+server=1
+listen=1
+discover=1
+disablewallet=1
+shrinkdebugfile=1
+upnp=1
+natpmp=1
+rest=0
+
+# --- Pruning ---
+prune=5000
+
+# --- Indexing ---
+txindex=0
+
+# --- Network ---
+maxconnections=60
+listenonion=1
+proxy=127.0.0.1:9050
+
+# --- Performance (Tailored for 8GB RAM) ---
+dbcache=600
+par=6
+assumevalid=0000000000000000000096695346030999516627632970799440621115809669
+
+# --- Mempool ---
+maxmempool=150
+
+# --- Security & RPC ---
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+
+# --- Knots Policy ---
+permitbaremultisig=0
+datacarrier=1
+datacarriersize=80
+rejecttokens=1
+"#.to_string()
+    };
+
+    let mut lines: Vec<String> = config_content
+        .lines()
+        .map(|line| line.to_string())
+        .filter(|line| {
+            let trimmed = line.trim();
+            !trimmed.starts_with("rpcuser=") && !trimmed.starts_with("rpcpassword=")
+        })
+        .collect();
+
+    lines.push(format!("rpcuser={}", u));
+    lines.push(format!("rpcpassword={}", p));
+
+    let new_content = lines.join("\n") + "\n";
+    std::fs::write(&conf_path, new_content).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
 
 // --- Log Buffering ---
 
@@ -165,6 +304,15 @@ async fn start_node(app: AppHandle, state: State<'_, NodeState>) -> Result<Statu
 
     let tor_path = root.join("bin/tor.exe");
 
+    // Automatically unblock the binaries on Windows if they have Mark of the Web
+    #[cfg(target_os = "windows")]
+    {
+        unblock_file(bin_path);
+        if tor_path.exists() {
+            unblock_file(&tor_path);
+        }
+    }
+
     let data_dir = get_data_dir(&app);
     if !data_dir.exists() {
         std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
@@ -183,8 +331,8 @@ listen=1
 discover=1
 disablewallet=1
 shrinkdebugfile=1
-upnp=0
-natpmp=0
+upnp=1
+natpmp=1
 rest=0
 
 # --- Pruning ---
@@ -432,7 +580,9 @@ pub fn run() {
             close_window,
             minimize_window,
             maximize_window,
-            get_node_log
+            get_node_log,
+            check_rpc_credentials_set,
+            set_rpc_credentials
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

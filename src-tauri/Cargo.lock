@@ -157,7 +157,7 @@ checksum = "2dee39a0ee5b4095224a0cfc6bf4cc1baf0f9624b96b367e53b66d974e51d953"
 
 [[package]]
 name = "bitcoin-portable"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "bitcoincore-rpc",
  "serde",
