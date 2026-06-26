@@ -197,6 +197,7 @@ permitbaremultisig=0
 datacarrier=1
 datacarriersize=80
 rejecttokens=1
+consensusrules=rdts
 "#.to_string()
     };
 
@@ -363,6 +364,7 @@ permitbaremultisig=0
 datacarrier=1
 datacarriersize=80
 rejecttokens=1
+consensusrules=rdts
 "#;
          std::fs::write(&conf_path, config).map_err(|e| e.to_string())?;
     }
@@ -562,6 +564,12 @@ fn get_node_log(app: AppHandle) -> Result<String, String> {
     }
 }
 
+#[tauri::command]
+fn execute_rpc_command(app: AppHandle, state: State<NodeState>, method: String, params: Vec<serde_json::Value>) -> Result<serde_json::Value, String> {
+    let client = initialize_rpc_client(&state, &app)?;
+    client.call::<serde_json::Value>(&method, &params).map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -582,7 +590,8 @@ pub fn run() {
             maximize_window,
             get_node_log,
             check_rpc_credentials_set,
-            set_rpc_credentials
+            set_rpc_credentials,
+            execute_rpc_command
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

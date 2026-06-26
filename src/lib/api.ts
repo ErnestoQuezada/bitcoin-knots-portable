@@ -102,3 +102,8 @@ export const setRpcCredentials = async (username: string, password: string): Pro
     return invoke('set_rpc_credentials', { username, password });
 };
 
+export const executeRpcCommand = async (method: string, params: any[] = []): Promise<any> => {
+    if (MOCK_MODE) { return { mock: "Mock response", method, params }; }
+    return invoke('execute_rpc_command', { method, params });
+};
+

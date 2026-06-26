@@ -10,6 +10,16 @@ interface SystemLogProps {
     onClearLog?: () => void;
 }
 
+const formatTimeAgo = (timestamp: number) => {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = Math.max(0, now - timestamp);
+    if (diff < 60) return `${diff} seconds ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    if (diff < 31536000) return `${Math.floor(diff / 86400)} days ago`;
+    return `${Math.floor(diff / 31536000)} years ago`;
+};
+
 const SystemLog: React.FC<SystemLogProps> = React.memo(({ errorInfo, running, chainInfo, blocks, onViewLog, logContent, onClearLog }) => {
     return (
         <div
@@ -69,7 +79,14 @@ const SystemLog: React.FC<SystemLogProps> = React.memo(({ errorInfo, running, ch
                                 </div>
                                 {chainInfo.initialblockdownload && (
                                     <div style={{ color: '#F7931A', background: 'rgba(247, 147, 26, 0.05)', padding: '0.5rem', borderRadius: '4px' }}>
-                                        [INFO] Initial Block Download active. Results may be delayed.
+                                        <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>[INFO] Initial Block Download active.</div>
+                                        <div style={{ color: 'var(--text-dim)', fontSize: '0.65rem', display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
+                                            <span>Headers Sync: {((chainInfo.headers / Math.max(chainInfo.headers, 840000)) * 100).toFixed(2)}%</span>
+                                            <span>Blocks: {chainInfo.blocks.toLocaleString()} / {chainInfo.headers.toLocaleString()}</span>
+                                            {chainInfo.mediantime && (
+                                                <span>Last Synced Block Mined: {formatTimeAgo(chainInfo.mediantime)}</span>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                                 <div style={{ color: 'var(--text-dim)', fontSize: '0.65rem' }}>

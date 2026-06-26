@@ -14,24 +14,24 @@ const SyncProgress: React.FC<SyncProgressProps> = React.memo(({ progress, blocks
     const headerProgress = Math.min((headers / estimatedTotalHeaders) * 100, 99.9);
     
     return (
-        <div className="premium-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <span className="card-label">Synchronization</span>
+        <div className="premium-card" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '0.75rem' }}>
+            <span className="card-label" style={{ marginBottom: '0.5rem', fontSize: '0.7rem' }}>Synchronization</span>
             
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 {isHeaderSync ? (
                     <>
-                        <span className="big-stat" style={{ color: 'var(--text-dim)', fontSize: '1.25rem' }}>HEADER SYNC</span>
-                        <span className="sub-stat" style={{ color: 'var(--accent)' }}>{headers.toLocaleString()}</span>
+                        <span className="big-stat" style={{ color: 'var(--text-dim)', fontSize: '1rem' }}>HEADER SYNC</span>
+                        <span className="sub-stat" style={{ color: 'var(--accent)', fontSize: '0.7rem' }}>{headers.toLocaleString()}</span>
                     </>
                 ) : (
                     <>
-                        <span className="big-stat">{progress}%</span>
-                        <span className="sub-stat">PROCESSED</span>
+                        <span className="big-stat" style={{ fontSize: '1.5rem' }}>{progress}%</span>
+                        <span className="sub-stat" style={{ fontSize: '0.7rem' }}>PROCESSED</span>
                     </>
                 )}
             </div>
 
-            <div style={{ width: '100%', background: '#090909', borderRadius: '10px', height: '6px', overflow: 'hidden', marginBottom: '0.75rem' }}>
+            <div style={{ width: '100%', background: '#090909', borderRadius: '10px', height: '6px', overflow: 'hidden', marginBottom: '0.5rem' }}>
                 <div
                     style={{
                         width: isHeaderSync ? `${headerProgress}%` : `${progress}%`,
@@ -48,12 +48,12 @@ const SyncProgress: React.FC<SyncProgressProps> = React.memo(({ progress, blocks
 
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>BLOCKS</span>
-                    <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', fontWeight: 'bold' }}>{blocks.toLocaleString()}</span>
+                    <span style={{ fontSize: '0.55rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>BLOCKS</span>
+                    <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', fontWeight: 'bold' }}>{blocks.toLocaleString()}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>HEADERS</span>
-                    <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--accent)' }}>{headers.toLocaleString()}</span>
+                    <span style={{ fontSize: '0.55rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>HEADERS</span>
+                    <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--accent)' }}>{headers.toLocaleString()}</span>
                 </div>
             </div>
         </div>
