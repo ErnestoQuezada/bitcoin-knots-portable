@@ -138,42 +138,44 @@ fn initialize_rpc_client(state: &NodeState, app: &AppHandle) -> Result<Arc<Clien
 }
 
 #[tauri::command]
-fn check_rpc_credentials_set(app: AppHandle) -> Result<bool, String> {
-    Ok(get_rpc_credentials_from_conf(&app).is_some())
+fn check_initial_setup(app: AppHandle) -> Result<bool, String> {
+    let data_dir = get_data_dir(&app);
+    let conf_path = data_dir.join("bitcoin.conf");
+    Ok(conf_path.exists())
 }
 
 #[tauri::command]
-fn set_rpc_credentials(app: AppHandle, username: String, password: String) -> Result<(), String> {
-    let u = username.trim();
-    let p = password.trim();
-    if u.is_empty() || p.is_empty() {
-        return Err("Username and password cannot be empty".into());
-    }
-
+fn save_initial_config(app: AppHandle, username: Option<String>, password: Option<String>, prune: bool, prune_size_mb: u64) -> Result<(), String> {
     let data_dir = get_data_dir(&app);
     if !data_dir.exists() {
         std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
     }
     
     let conf_path = data_dir.join("bitcoin.conf");
-    let config_content = if conf_path.exists() {
-        std::fs::read_to_string(&conf_path).map_err(|e| e.to_string())?
+    
+    let (prune_str, txindex_str) = if prune {
+        (format!("prune={}", prune_size_mb), "txindex=0".to_string())
     } else {
-        r#"# --- Core ---
+        ("prune=0".to_string(), "txindex=1".to_string())
+    };
+
+    let rpc_auth = match (username, password) {
+        (Some(u), Some(p)) => format!("rpcuser={}\nrpcpassword={}\n", u.trim(), p.trim()),
+        _ => "".to_string(),
+    };
+
+    let config_content = format!(r#"# --- Core ---
 server=1
 listen=1
-discover=1
 disablewallet=1
 shrinkdebugfile=1
-upnp=1
-natpmp=1
 rest=0
 
 # --- Pruning ---
-prune=5000
+{}
 
 # --- Indexing ---
-txindex=0
+{}
 
 # --- Network ---
 maxconnections=60
@@ -198,23 +200,9 @@ datacarrier=1
 datacarriersize=80
 rejecttokens=1
 consensusrules=rdts
-"#.to_string()
-    };
+{}"#, prune_str, txindex_str, rpc_auth);
 
-    let mut lines: Vec<String> = config_content
-        .lines()
-        .map(|line| line.to_string())
-        .filter(|line| {
-            let trimmed = line.trim();
-            !trimmed.starts_with("rpcuser=") && !trimmed.starts_with("rpcpassword=")
-        })
-        .collect();
-
-    lines.push(format!("rpcuser={}", u));
-    lines.push(format!("rpcpassword={}", p));
-
-    let new_content = lines.join("\n") + "\n";
-    std::fs::write(&conf_path, new_content).map_err(|e| e.to_string())?;
+    std::fs::write(&conf_path, config_content).map_err(|e| e.to_string())?;
 
     Ok(())
 }
@@ -329,11 +317,8 @@ async fn start_node(app: AppHandle, state: State<'_, NodeState>) -> Result<Statu
           let config = r#"# --- Core ---
 server=1
 listen=1
-discover=1
 disablewallet=1
 shrinkdebugfile=1
-upnp=1
-natpmp=1
 rest=0
 
 # --- Pruning ---
@@ -589,8 +574,8 @@ pub fn run() {
             minimize_window,
             maximize_window,
             get_node_log,
-            check_rpc_credentials_set,
-            set_rpc_credentials,
+            check_initial_setup,
+            save_initial_config,
             execute_rpc_command
         ])
         .run(tauri::generate_context!())

@@ -5,7 +5,7 @@ Sovereign Node. Silent Sync. Zero Compromise.
 
 Author  : Acreonte (LNAddress: acreonte@blink.sv)
 
-Version : 0.3.2
+Version : 0.3.3
 
 Network : Bitcoin Mainnet
 
@@ -92,9 +92,10 @@ FOLDER STRUCTURE
 ------------------------------------------------------------
 
 bitcoin-portable.exe     -> Launcher
+bin/bitcoin-cli.exe      -> Bitcoin-cli binary
 bin/bitcoind.exe         -> Bitcoin binary
+bin/tor.exe				 -> Tor binary
 data/                    -> Blockchain data (delete = re-sync)
-logs/                    -> Application logs
 
 
 Built around the Bitcoin Knots implementation.

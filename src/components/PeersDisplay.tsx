@@ -103,16 +103,34 @@ const PeersDisplay: React.FC<PeersDisplayProps> = React.memo(({ peers, peerInfo,
     return (
         <div className="premium-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+                <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', padding: '0.2rem', borderRadius: '8px', gap: '0.2rem' }}>
                     <div 
                         onClick={() => setActiveTab('peers')}
-                        style={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', color: activeTab === 'peers' ? 'var(--accent)' : 'var(--text-dim)', borderBottom: activeTab === 'peers' ? '2px solid var(--accent)' : 'none', paddingBottom: '0.2rem' }}
+                        style={{ 
+                            cursor: 'pointer', 
+                            fontSize: '0.75rem', 
+                            fontWeight: 'bold', 
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '6px',
+                            background: activeTab === 'peers' ? 'var(--accent)' : 'transparent',
+                            color: activeTab === 'peers' ? '#fff' : 'var(--text-dim)',
+                            transition: 'all 0.2s ease'
+                        }}
                     >
                         Active Peers
                     </div>
                     <div 
                         onClick={() => setActiveTab('rpc')}
-                        style={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', color: activeTab === 'rpc' ? 'var(--accent)' : 'var(--text-dim)', borderBottom: activeTab === 'rpc' ? '2px solid var(--accent)' : 'none', paddingBottom: '0.2rem' }}
+                        style={{ 
+                            cursor: 'pointer', 
+                            fontSize: '0.75rem', 
+                            fontWeight: 'bold', 
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '6px',
+                            background: activeTab === 'rpc' ? 'var(--accent)' : 'transparent',
+                            color: activeTab === 'rpc' ? '#fff' : 'var(--text-dim)',
+                            transition: 'all 0.2s ease'
+                        }}
                     >
                         RPC Console
                     </div>

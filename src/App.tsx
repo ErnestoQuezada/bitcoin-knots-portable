@@ -1,4 +1,4 @@
-import { startNode, stopNode, fetchBlockchainInfo, fetchNetworkInfo, fetchPeerInfo, closeWindow, minimizeWindow, maximizeWindow, getNodeLog, checkRpcCredentialsSet } from './lib/api';
+import { startNode, stopNode, fetchBlockchainInfo, fetchNetworkInfo, fetchPeerInfo, closeWindow, minimizeWindow, maximizeWindow, getNodeLog, checkInitialSetup } from './lib/api';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import './minimal.css';
 
@@ -22,22 +22,22 @@ function App() {
     const [nodeData, setNodeData] = useState<NodeData>({ chainInfo: null, netInfo: null, peerInfo: null });
     const [isVisible, setIsVisible] = useState(true);
     const [logContent, setLogContent] = useState<string | null>(null);
-    const [credentialsSet, setCredentialsSet] = useState<boolean | null>(null);
+    const [initialSetupDone, setInitialSetupDone] = useState<boolean | null>(null);
 
     const isDesktop = useMemo(() => !navigator.userAgent.includes('Android') && !navigator.userAgent.includes('Mobi'), []);
 
-    // Lifecycle to check if RPC credentials are set
+    // Lifecycle to check if initial setup is complete
     useEffect(() => {
-        const checkCredentials = async () => {
+        const checkSetup = async () => {
             try {
-                const isSet = await checkRpcCredentialsSet();
-                setCredentialsSet(isSet);
+                const isSet = await checkInitialSetup();
+                setInitialSetupDone(isSet);
             } catch (e) {
-                console.error("Failed to check RPC credentials:", e);
-                setCredentialsSet(false);
+                console.error("Failed to check initial setup:", e);
+                setInitialSetupDone(false);
             }
         };
-        checkCredentials();
+        checkSetup();
     }, []);
 
     // Lifecycle
@@ -136,7 +136,7 @@ function App() {
         return gb.toFixed(2) + " GB";
     }, [nodeData.chainInfo]);
 
-    if (credentialsSet === null) {
+    if (initialSetupDone === null) {
         return (
             <div className="setup-container">
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
@@ -147,8 +147,8 @@ function App() {
         );
     }
 
-    if (!credentialsSet) {
-        return <SetupCredentials onSetupComplete={() => setCredentialsSet(true)} />;
+    if (!initialSetupDone) {
+        return <SetupCredentials onSetupComplete={() => setInitialSetupDone(true)} />;
     }
 
     return (
@@ -224,7 +224,7 @@ function App() {
 
             <footer className="footer">
                 <div className="footer-left">
-                    <span className="footer-version-label">v0.3.2</span>
+                    <span className="footer-version-label">v0.3.3</span>
                 </div>
                 <div className="footer-right">
                     Portable Bitcoin Node

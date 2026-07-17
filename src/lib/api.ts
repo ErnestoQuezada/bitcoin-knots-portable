@@ -84,22 +84,19 @@ export const getNodeLog = async (): Promise<string> => {
     return invoke('get_node_log');
 };
 
-export const checkRpcCredentialsSet = async (): Promise<boolean> => {
+export const checkInitialSetup = async (): Promise<boolean> => {
     if (MOCK_MODE) {
-        return localStorage.getItem('rpc_credentials_set') === 'true';
+        return localStorage.getItem('initial_setup_done') === 'true';
     }
-    return invoke('check_rpc_credentials_set');
+    return invoke('check_initial_setup');
 };
 
-export const setRpcCredentials = async (username: string, password: string): Promise<any> => {
+export const saveInitialConfig = async (username: string | null, password: string | null, prune: boolean, pruneSizeMb: number): Promise<any> => {
     if (MOCK_MODE) {
-        if (!username.trim() || !password.trim()) {
-            throw new Error("Username and password cannot be empty");
-        }
-        localStorage.setItem('rpc_credentials_set', 'true');
+        localStorage.setItem('initial_setup_done', 'true');
         return;
     }
-    return invoke('set_rpc_credentials', { username, password });
+    return invoke('save_initial_config', { username, password, prune, pruneSizeMb });
 };
 
 export const executeRpcCommand = async (method: string, params: any[] = []): Promise<any> => {
