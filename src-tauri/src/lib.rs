@@ -167,7 +167,6 @@ fn save_initial_config(app: AppHandle, username: Option<String>, password: Optio
     let config_content = format!(r#"# --- Core ---
 server=1
 listen=1
-disablewallet=1
 shrinkdebugfile=1
 rest=0
 
@@ -199,7 +198,6 @@ permitbaremultisig=0
 datacarrier=1
 datacarriersize=80
 rejecttokens=1
-consensusrules=rdts
 {}"#, prune_str, txindex_str, rpc_auth);
 
     std::fs::write(&conf_path, config_content).map_err(|e| e.to_string())?;
@@ -317,7 +315,6 @@ async fn start_node(app: AppHandle, state: State<'_, NodeState>) -> Result<Statu
           let config = r#"# --- Core ---
 server=1
 listen=1
-disablewallet=1
 shrinkdebugfile=1
 rest=0
 
@@ -349,7 +346,6 @@ permitbaremultisig=0
 datacarrier=1
 datacarriersize=80
 rejecttokens=1
-consensusrules=rdts
 "#;
          std::fs::write(&conf_path, config).map_err(|e| e.to_string())?;
     }

@@ -5,7 +5,7 @@ Sovereign Node. Silent Sync. Zero Compromise.
 
 Author  : Acreonte (LNAddress: acreonte@blink.sv)
 
-Version : 0.3.3
+Version : 0.3.4
 
 Network : Bitcoin Mainnet
 

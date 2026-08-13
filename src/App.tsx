@@ -224,7 +224,7 @@ function App() {
 
             <footer className="footer">
                 <div className="footer-left">
-                    <span className="footer-version-label">v0.3.3</span>
+                    <span className="footer-version-label">v0.3.4</span>
                 </div>
                 <div className="footer-right">
                     Portable Bitcoin Node

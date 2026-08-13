@@ -235,8 +235,25 @@ const PeersDisplay: React.FC<PeersDisplayProps> = React.memo(({ peers, peerInfo,
                     </div>
                 </>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0.5rem' }}>
-                    <div style={{ flex: 1, background: '#090909', borderRadius: '8px', border: '1px solid var(--border-subtle)', padding: '0.5rem', overflowY: 'auto', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem' }} className="custom-scrollbar">
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: '0.5rem' }}>
+                    <div style={{ flex: 1, position: 'relative', background: '#090909', borderRadius: '8px', border: '1px solid var(--border-subtle)', padding: '0.5rem', overflowY: 'auto', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem' }} className="custom-scrollbar">
+                        {rpcOutput && (
+                            <button 
+                                onClick={() => {
+                                    navigator.clipboard.writeText(rpcOutput);
+                                    setCopied(true);
+                                    setTimeout(() => setCopied(false), 2000);
+                                }}
+                                style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '4px', padding: '0.2rem', color: copied ? 'var(--success)' : 'var(--text-dim)', cursor: 'pointer', zIndex: 10 }}
+                                title="Copy Output"
+                            >
+                                {copied ? (
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                ) : (
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                )}
+                            </button>
+                        )}
                         {rpcOutput ? (
                             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                                 {renderHighlightedJson(rpcOutput)}
@@ -245,7 +262,7 @@ const PeersDisplay: React.FC<PeersDisplayProps> = React.memo(({ peers, peerInfo,
                             <div style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>Enter a command (e.g. getblockchaininfo)</div>
                         )}
                     </div>
-                    <div className="search-wrapper" style={{ marginTop: 'auto' }}>
+                    <div className="search-wrapper" style={{ flexShrink: 0, marginTop: 'auto' }}>
                         <input 
                             type="text" 
                             className="minimal-input" 
